@@ -5,52 +5,32 @@ import Spinner from '../spinner';
 import ErrorMessage from '../error-message';
 import Skeleton from '../skeleton';
 
-import MarvelService from '../../services/marvel-service';
+import useMarvelService from '../../services/marvel-service';
 
 import './char-info.scss';
 
 const CharInfo = (props)=> {
 
-	const marvelService = new MarvelService();
+	const {loading, error, getCharacter, clearError} = useMarvelService();
 
 	const [char, setChar] = useState(null);
-	const [loading, setLoading] = useState(false);
-	const [error, setError] = useState(false);
 
 	useEffect(() => {
 		updateChar();
 	}, [props.charId]);
 
-	// componentDidUpdate(prevProps) {
-	// 	if (this.props.charId !== prevProps.charId) {
-	// 		updateChar();
-	// 	}
-	// }
-
 	const updateChar = () => {
 		const {charId} = props;
 		if(!charId) return;
 
-		onCharLoading();
+		clearError();
 
-		marvelService
-			.getCharacter(charId)
-			.then(onCharLoaded)
-			.catch(onError);
+		getCharacter(charId)
+			.then(onCharLoaded);
 	}
 
 	const onCharLoaded = (char) => {
 		setChar(char);
-		setLoading(false)
-	}
-
-	const onCharLoading = () => {
-		setLoading(true)
-	}
-
-	const onError = () => {
-		setLoading(false);
-		setError(true);
 	}
 
 		const skeleton = char || loading || error ? null : <Skeleton />;

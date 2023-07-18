@@ -3,60 +3,43 @@ import React, {useEffect, useState} from 'react';
 import Spinner from '../spinner';
 import ErrorMessage from '../error-message';
 
-import MarvelService from '../../services/marvel-service';
+import useMarvelService from '../../services/marvel-service';
 
 import './random-char.scss';
 import mjolnir from '../../resources/img/mjolnir.png';
 
 const RandomChar = () => {
 
-	const marvelService = new MarvelService();
-
 	const [char, setChar] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
-
+	const {loading, error, getCharacter, clearError} = useMarvelService();
+	
+	console.log("start ", char);
+  
 	useEffect(() => {
 		updateChar();
-		const timerId = setInterval(updateChar, 20000);
+		const timerId = setInterval(updateChar, 60000);
 
 		return () => {
 			clearInterval(timerId);
 		}
 	}, []);
 
-
 	const onCharLoaded = (char) => {
 		setChar(char);
-		setLoading(false);
-		setError(false);
-	}
-
-	const onCharLoading = () => {
-		setLoading(true);
-	}
-
-	const onError = () => {
-		setLoading(false);
-		setError(true);
 	}
 
 	const updateChar = () => {
+		clearError();		
 		const id = Math.floor(Math.random() * (1011400 - 1011000) + 1011000);
-
-		onCharLoading();
-		marvelService
-			.getCharacter(id)
-			.then(onCharLoaded)
-			.catch(onError);
+		getCharacter(id).then(onCharLoaded);
 	}
 
 
-		const havingData = !(loading || error);
+		const havingData = !(loading || error || !char);
 
 		const spinner =  loading ? <Spinner /> : null;
 		const errorMessage = error ? <ErrorMessage /> : null; 
-		const content =  havingData ? <CharView char={ char } /> : null;
+		const content = havingData ? <CharView char={char} /> : null;
 
 		return (
 			<div className="randomchar">
@@ -82,6 +65,8 @@ const RandomChar = () => {
 
 const CharView = ({ char }) => {
 
+	console.log("charview ", char)
+
 	const {name, description, thumbnail, homepage, wiki} = char;
 
 	/* Finding the image's name */
@@ -92,7 +77,7 @@ const CharView = ({ char }) => {
 
 	return (
 		<div className="randomchar__block">
-			{/* <img src={thumbnail} alt="Random character" className="randomchar__img" style={{objectFit: (imgName === "image_not_available.jpg") ? "contain" : "cover"} } /> */}
+
 			<img src={thumbnail} alt="Random character" className="randomchar__img" style={ {objectFit: (imgAvailable) ? "contain" : "cover"} } />
 			<div className="randomchar__info">
 					<p className="randomchar__name">{name}</p>
@@ -100,10 +85,10 @@ const CharView = ({ char }) => {
 							{description}
 					</p>
 					<div className="randomchar__btns">
-							<a href={homepage} className="button button__main">
+							<a href={homepage} target="_blank" rel="noreferrer" className="button button__main">
 								<div className="inner">homepage</div>
 							</a>
-							<a href={wiki} className="button button__secondary">
+							<a href={wiki} target="_blank" rel="noreferrer" className="button button__secondary">
 								<div className="inner">Wiki</div>
 							</a>
 					</div>
