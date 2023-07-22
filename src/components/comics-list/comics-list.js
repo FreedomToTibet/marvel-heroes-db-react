@@ -7,15 +7,16 @@ import Spinner from '../spinner';
 import useMarvelService from '../../services/marvel-service';
 
 import './comics-list.scss';
-// import uw from '../../resources/img/UW.png';
-// import xMen from '../../resources/img/x-men.png';
 
 const ComicsList = () => {
   const {loading, error, getAllComics} = useMarvelService();
 
-  const [comicsList, setComicsList] = useState([]);
+	const storageComicsOffset = Number(sessionStorage.getItem('storageComicsOffset'));
+	const storageComicsList = JSON.parse(sessionStorage.getItem('storageComicsList'));
+
+  const [comicsList, setComicsList] = useState(!storageComicsList ? [] : storageComicsList);
   const [newItemLoading, setnewItemLoading] = useState(false);
-  const [offset, setOffset] = useState(0);
+  const [offset, setOffset] = useState(!storageComicsOffset ? 0 : storageComicsOffset);
   const [comicsEnded, setComicsEnded] = useState(false);
 
   useEffect(() => {
@@ -24,7 +25,7 @@ const ComicsList = () => {
 
   const onRequest = (offset, initial) => {
     initial ? setnewItemLoading(false) : setnewItemLoading(true);
-    getAllComics(offset).then(onComicsListLoaded);
+		getAllComics(offset).then(onComicsListLoaded)
   };
 
   const onComicsListLoaded = (newComicsList) => {
@@ -35,6 +36,8 @@ const ComicsList = () => {
     setComicsList([...comicsList, ...newComicsList]);
     setnewItemLoading(false);
     setOffset(offset + 8);
+		sessionStorage.setItem('storageComicsOffset', offset);
+		sessionStorage.setItem('storageComicsList', JSON.stringify(comicsList));
     setComicsEnded(ended);
   };
 

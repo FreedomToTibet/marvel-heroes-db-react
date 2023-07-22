@@ -10,9 +10,12 @@ import './char-list.scss';
 const CharList = (props) => {
   const {loading, error, getAllCharacters} = useMarvelService();
 
-	const [charList, setCharList] = useState([]);
+	const storageCharOffset = Number(sessionStorage.getItem('storageCharOffset'));
+	const storageCharList = JSON.parse(sessionStorage.getItem('storageCharList'));
+
+	const [charList, setCharList] = useState(!storageCharList ? [] : storageCharList);
 	const [newItemsLoading, setNewItemLoading] = useState(false);
-	const [offset, setOffset] = useState(210);
+	const [offset, setOffset] = useState(!storageCharOffset ? 210 : storageCharOffset);
 	const [charListEnded, setCharListEnded] = useState(false);
 
 	useEffect(() => {
@@ -36,6 +39,8 @@ const CharList = (props) => {
 		setCharList(charList => [...charList, ...newCharList]);
 		setNewItemLoading(newItemsLoading => false);
 		setOffset(offset => offset + 9);
+		sessionStorage.setItem('storageCharOffset', offset);
+		sessionStorage.setItem('storageCharList', JSON.stringify(charList));
 		setCharListEnded(charListEnded => ended);
   };
 

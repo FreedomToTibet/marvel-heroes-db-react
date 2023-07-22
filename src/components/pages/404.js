@@ -1,14 +1,27 @@
-import ErrorMessage from "../error-message";
-import {Link} from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
+
+import background from '../../resources/img/Marvel-404.gif';
 
 const Page404 = () => {
-    return (
-        <div>
-            <ErrorMessage/>
-            <p style={{'textAlign': 'center', 'fontWeight': 'bold', 'fontSize': '24px'}}>Page doesn't exist</p>
-            <Link style={{'display': 'block', 'textAlign': 'center', 'fontWeight': 'bold', 'fontSize': '24px', 'marginTop': '30px'}} to="/">Back to main page</Link>
-        </div>
-    )
-}
+  const navigate = useNavigate();
+
+  return (
+    <div style={{background: `url(${background}) no-repeat`, height: '100vh'}}>
+      <Link
+        style={{
+          display: 'block',
+          textAlign: 'center',
+          fontWeight: 'bold',
+          fontSize: '24px',
+          marginTop: '30px',
+          color: '#9f0013',
+        }}
+        onClick={() => navigate(-1)}
+      >
+        Back to previous page
+      </Link>
+    </div>
+  );
+};
 
 export default Page404;
