@@ -12,8 +12,6 @@ const RandomChar = () => {
 
 	const [char, setChar] = useState(null);
 	const {loading, error, getCharacter, clearError} = useMarvelService();
-	
-	console.log("start ", char);
   
 	useEffect(() => {
 		updateChar();
@@ -64,8 +62,6 @@ const RandomChar = () => {
 }
 
 const CharView = ({ char }) => {
-
-	console.log("charview ", char)
 
 	const {name, description, thumbnail, homepage, wiki} = char;
 
