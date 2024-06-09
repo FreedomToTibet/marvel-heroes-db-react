@@ -91,10 +91,9 @@ const CharDetailsView = ({char}) => {
         {!!comics.length ? null : "Oops! There're no any comics with this hero."}
         {comics.slice(0, 10).map((item, index) => {
           const comicId = item.resourceURI.substring(43);
-					console.log(comicId);
 
           return (
-            <Link to={`comics/${comicId}`} key={`${index + comicId}`}>
+            <Link to={`/comics/${comicId}`} key={`${index + comicId}`}>
               <li key={index} className="char__comics-item">
                 {item.name}
               </li>
