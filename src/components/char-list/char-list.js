@@ -1,14 +1,29 @@
 import React, {useState, useEffect, useRef} from 'react';
 import PropTypes from 'prop-types';
 
+import useMarvelService from '../../services/marvel-service';
 import Spinner from '../spinner';
 import ErrorMessage from '../error-message';
-import useMarvelService from '../../services/marvel-service';
 
 import './char-list.scss';
 
+const setContent = (process, Component, newItemsLoading) => {
+	switch (process) {
+		case 'waiting':
+			return <Spinner />;
+		case 'loading':
+			return newItemsLoading ? <Component /> : <Spinner />;
+		case 'confirmed':
+			return <Component />;
+		case 'error':
+			return <ErrorMessage />;
+		default:
+			return null;
+	}
+};
+
 const CharList = (props) => {
-  const {loading, error, getAllCharacters} = useMarvelService();
+  const {getAllCharacters, process, setProcess} = useMarvelService();
 
 	const storageCharOffset = Number(sessionStorage.getItem('storageCharOffset'));
 	const storageCharList = JSON.parse(sessionStorage.getItem('storageCharList'));
@@ -27,7 +42,8 @@ const CharList = (props) => {
 		initial ? setNewItemLoading(false) : setNewItemLoading(true);
 
     getAllCharacters(offset)
-      .then(onCharListLoaded);
+      .then(onCharListLoaded)
+			.then(() => setProcess('confirmed'));
   };
 
   const onCharListLoaded = (newCharList) => {
@@ -89,19 +105,9 @@ const CharList = (props) => {
     return <ul className="char__grid">{items}</ul>;
   };
 
-    const items = renderItems(charList);
-
-    const errorMessage = error ? <ErrorMessage /> : null;
-    const spinner = loading && !newItemsLoading ? <Spinner /> : null;
-
-    // const content = !(loading || error) ? items : null;
-
     return (
       <div className="char__list">
-        {errorMessage}
-        {spinner}
-        {/* {content} */}
-        {items}
+        {setContent(process, () => renderItems(charList), newItemsLoading)}
         <button
           className="button button__main button__long"
           disabled={newItemsLoading}
