@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useMemo} from 'react';
 import PropTypes from 'prop-types';
 import {Link} from 'react-router-dom';
 
@@ -34,11 +34,13 @@ const CharInfo = (props) => {
     setChar(char);
   };
 
-  
+  const charInfoMemo = useMemo(() => {
+		return setContent(process, CharDetailsView, char);
+	}, [process]);
 
   return (
     <div className="char__info">
-      {setContent(process, CharDetailsView, char)}
+      {charInfoMemo}
     </div>
   );
 };

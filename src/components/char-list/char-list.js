@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React, {useState, useEffect, useRef, useMemo} from 'react';
 import PropTypes from 'prop-types';
 
 import useMarvelService from '../../services/marvel-service';
@@ -105,9 +105,14 @@ const CharList = (props) => {
     return <ul className="char__grid">{items}</ul>;
   };
 
+	const charListMemo = useMemo(() => {
+		return setContent(process, () => renderItems(charList), newItemsLoading)
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [process])
+
     return (
       <div className="char__list">
-        {setContent(process, () => renderItems(charList), newItemsLoading)}
+        {charListMemo}
         <button
           className="button button__main button__long"
           disabled={newItemsLoading}

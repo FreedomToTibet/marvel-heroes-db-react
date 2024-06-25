@@ -14,7 +14,6 @@ export const useHttp = () => {
             }
 
             const data = await response.json();
-						setProcess('confirmed');
             return data;
         } catch(e) {
 						setProcess('error');
