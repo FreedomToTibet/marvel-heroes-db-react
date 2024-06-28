@@ -7,7 +7,6 @@ import CharInfo from '../char-info';
 import ErrorBoundary from '../error-boundary';
 
 import decoration from '../../resources/img/vision.png';
-// import CharSearchForm from '../char-search-form/char-search-form';
 
 const MainPage = () => {
   const [selectedChar, setChar] = useState(null);
@@ -18,10 +17,10 @@ const MainPage = () => {
 
   return (
     <>
-			<Helmet>
-				<title>Marvel Universe</title>
-				<meta name="description" content="Marvel Universe" />
-			</Helmet>
+      <Helmet>
+        <title>Marvel Universe</title>
+        <meta name="description" content="Marvel Universe" />
+      </Helmet>
       <ErrorBoundary>
         <RandomChar />
       </ErrorBoundary>
@@ -29,14 +28,10 @@ const MainPage = () => {
         <ErrorBoundary>
           <CharList onCharSelected={onCharSelected} />
         </ErrorBoundary>
-        
-          <ErrorBoundary>
-            <CharInfo charId={selectedChar} />
-          </ErrorBoundary>
-          {/* <ErrorBoundary>
-            <CharSearchForm />
-          </ErrorBoundary> */}
-        
+				
+        <ErrorBoundary>
+          <CharInfo charId={selectedChar} />
+        </ErrorBoundary>
       </div>
       <img className="bg-decoration" src={decoration} alt="vision" />
     </>

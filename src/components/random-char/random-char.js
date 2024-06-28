@@ -1,4 +1,5 @@
 import React, {useEffect, useState} from 'react';
+import {Link} from 'react-router-dom';
 
 import useMarvelService from '../../services/marvel-service';
 import setContent from '../../utils/set-content';
@@ -21,7 +22,7 @@ const RandomChar = () => {
   }, []);
 
   const onCharLoaded = (char) => {
-    setChar(char);
+    setChar({...char, id: char.id});
   };
 
   const updateChar = () => {
@@ -52,7 +53,7 @@ const RandomChar = () => {
 };
 
 const CharView = ({data}) => {
-  const {name, description, thumbnail, homepage, wiki} = data;
+  const {name, description, thumbnail, homepage, wiki, id} = data;
 
   /* Finding the image's name */
   /* const imgRegExp = /http:\/\/(.*)\/(.*)/;
@@ -62,12 +63,14 @@ const CharView = ({data}) => {
 
   return (
     <div className="randomchar__block">
-      <img
+			<Link to={`/characters/${id}`} >
+			<img
         src={thumbnail}
         alt="Random character"
         className="randomchar__img"
         style={{objectFit: imgAvailable ? 'contain' : 'cover'}}
       />
+      </Link>
       <div className="randomchar__info">
         <p className="randomchar__name">{name}</p>
         <p className="randomchar__descr">{description}</p>

@@ -35,6 +35,7 @@ const CharList = (props) => {
 
 	useEffect(() => {
 		onRequest(offset, true);
+		// eslint-disable-next-line
 	}, []);
 
 

@@ -3,23 +3,38 @@ import PropTypes from 'prop-types';
 import {Link} from 'react-router-dom';
 
 import setContent from '../../utils/set-content';
-
 import useMarvelService from '../../services/marvel-service';
 
 import './char-info.scss';
 
-const CharInfo = (props) => {
+const CharInfo = ({charId}) => {
   const {getCharacter, clearError, process, setProcess} =
     useMarvelService();
 
   const [char, setChar] = useState(null);
 
-  useEffect(() => {
-    updateChar();
-  }, [props.charId]);
+  // useEffect(() => {
+  //   updateChar();
+	// 	// eslint-disable-next-line
+  // }, [charId]);
 
-  const updateChar = () => {
-    const {charId} = props;
+	useEffect(() => {
+    const savedCharId = sessionStorage.getItem('lastCharId');
+    const idToLoad = charId || savedCharId;
+    if (idToLoad) {
+      updateChar(idToLoad);
+    }
+    // eslint-disable-next-line
+  }, [charId]);
+
+	useEffect(() => {
+    if (charId) {
+      sessionStorage.setItem('lastCharId', charId);
+    }
+  }, [charId]);
+
+
+  const updateChar = (charId) => {
     if (!charId) return;
 
     clearError();
@@ -31,11 +46,12 @@ const CharInfo = (props) => {
   };
 
   const onCharLoaded = (char) => {
-    setChar(char);
+    setChar({...char, charId});
   };
 
-  const charInfoMemo = useMemo(() => {
+	const charInfoMemo = useMemo(() => {
 		return setContent(process, CharDetailsView, char);
+		// eslint-disable-next-line
 	}, [process]);
 
   return (
@@ -46,7 +62,7 @@ const CharInfo = (props) => {
 };
 
 const CharDetailsView = ({data}) => {
-  const {name, description, thumbnail, homepage, wiki, comics} = data;
+  const {name, description, thumbnail, homepage, wiki, comics, charId} = data;
   let imgStyle = {objectFit: 'cover'};
 
   if (
@@ -59,7 +75,9 @@ const CharDetailsView = ({data}) => {
   return (
     <>
       <div className="char__basics">
-        <img src={thumbnail} alt={name} style={imgStyle} />
+			<Link to={`/characters/${charId}`} >
+				<img src={thumbnail} alt={name} style={imgStyle} />
+      </Link>
         <div>
           <div className="char__info-name">{name}</div>
           <div className="char__btns">
