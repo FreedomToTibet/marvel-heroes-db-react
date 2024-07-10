@@ -1,5 +1,6 @@
 import {useState} from 'react';
 import {Helmet} from 'react-helmet';
+import AppWrap from '../../wrapper/app-wrapper';
 
 import RandomChar from '../random-char';
 import CharList from '../char-list';
@@ -38,4 +39,4 @@ const MainPage = () => {
   );
 };
 
-export default MainPage;
+export default AppWrap(MainPage);

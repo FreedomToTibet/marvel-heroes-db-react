@@ -1,8 +1,9 @@
-import React, {useState, useEffect, useMemo} from 'react';
+import React, {useState, useEffect} from 'react';
 import {Link} from 'react-router-dom';
 
 import ErrorMessage from '../error-message';
 import Spinner from '../spinner';
+import AppWrap from '../../wrapper/app-wrapper';
 
 import useMarvelService from '../../services/marvel-service';
 
@@ -36,6 +37,7 @@ const ComicsList = () => {
 
   useEffect(() => {
     onRequest(offset, true);
+		// eslint-disable-next-line
   }, []);
 
   const onRequest = (offset, initial) => {
@@ -89,4 +91,4 @@ const ComicsList = () => {
   );
 };
 
-export default ComicsList;
+export default AppWrap(ComicsList);
