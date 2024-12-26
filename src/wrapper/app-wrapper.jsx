@@ -50,8 +50,8 @@ const AppWrap = (Component) =>
             style={{
               cursor: 'pointer',
               position: 'fixed',
-              bottom: '60px',
-              left: '85px',
+              bottom: '10%',
+              left: '2%',
 							fontSize: '40px',
               visibility: isVisible ? 'visible' : 'hidden',
 							transform: isHoveredTop ? 'scale(1.1)' : 'scale(1)',
@@ -73,8 +73,8 @@ const AppWrap = (Component) =>
             style={{
               cursor: 'pointer',
               position: 'fixed',
-              bottom: '10px',
-              left: '85px',
+              bottom: '2%',
+              left: '2%',
 							fontSize: '40px',
               visibility: isVisible ? 'visible' : 'hidden',
 							transform: isHoveredBottom ? 'scale(1.1)' : 'scale(1)',
