@@ -38,13 +38,33 @@ const CharList = (props) => {
 		// eslint-disable-next-line
 	}, []);
 
+	const returnScrollPosition = () => {
+		const savedScrollPosition = sessionStorage.getItem('scrollCharPosition');
+		if (savedScrollPosition) {
+			try {
+				const scrollY = parseInt(savedScrollPosition, 10);
+				window.scrollTo({
+					top: scrollY,
+					behavior: 'smooth'
+				});
+			} catch (e) {
+				console.error("Scroll error:", e);
+			}
+		}
+	}
+
+	const saveScrollPosition = () => {
+		const scrollPosition = (window.scrollY || document.documentElement.scrollTop) + 100;
+		sessionStorage.setItem('scrollCharPosition', scrollPosition);
+	};
 
   const onRequest = (offset, initial) => {
 		initial ? setNewItemLoading(false) : setNewItemLoading(true);
 
     getAllCharacters(offset)
       .then(onCharListLoaded)
-			.then(() => setProcess('confirmed'));
+			.then(() => setProcess('confirmed'))
+			.then(returnScrollPosition);
   };
 
   const onCharListLoaded = (newCharList) => {
@@ -118,7 +138,10 @@ const CharList = (props) => {
           className="button button__main button__long"
           disabled={newItemsLoading}
           style={{display: charListEnded ? 'none' : 'block'}}
-          onClick={() => onRequest(offset)}
+          onClick={() => {
+						onRequest(offset);
+						saveScrollPosition();
+					}}
         >
           <div className="inner">load more</div>
         </button>

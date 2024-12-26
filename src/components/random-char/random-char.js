@@ -63,7 +63,10 @@ const CharView = ({data}) => {
 
   return (
     <div className="randomchar__block">
-			<Link to={`/characters/${id}`} >
+			<Link 
+				to={`/characters/${id}`}
+				onClick={() => sessionStorage.setItem('scrollPosition', null)}
+			>
 			<img
         src={thumbnail}
         alt="Random character"

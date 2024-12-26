@@ -33,7 +33,6 @@ const CharInfo = ({charId}) => {
     }
   }, [charId]);
 
-
   const updateChar = (charId) => {
     if (!charId) return;
 
@@ -65,6 +64,15 @@ const CharDetailsView = ({data}) => {
   const {name, description, thumbnail, homepage, wiki, comics, charId} = data;
   let imgStyle = {objectFit: 'cover'};
 
+	const saveScrollPosition = () => {
+		const scrollPosition = (window.scrollY || document.documentElement.scrollTop) + 100;
+		sessionStorage.setItem('scrollCharPosition', scrollPosition);
+	};
+
+	// if (!charId) {
+	// 	charId = sessionStorage.getItem('lastCharId');
+	// }
+
   if (
     thumbnail.includes('image_not_available') ||
     thumbnail.includes('4c002e0305708.gif')
@@ -75,7 +83,10 @@ const CharDetailsView = ({data}) => {
   return (
     <>
       <div className="char__basics">
-			<Link to={`/characters/${charId}`} >
+			<Link 
+				to={`/characters/${charId ? charId : sessionStorage.getItem('lastCharId')}`}
+				onClick={saveScrollPosition}
+			>
 				<img src={thumbnail} alt={name} style={imgStyle} />
       </Link>
         <div>
@@ -109,7 +120,11 @@ const CharDetailsView = ({data}) => {
           const comicId = item.resourceURI.split('/').pop();
 
           return (
-            <Link to={`/comics/${comicId}`} key={`${index + comicId}`}>
+            <Link 
+							to={`/comics/${comicId}`} 
+							key={`${index + comicId}`}
+							onClick={saveScrollPosition}
+						>
               <li key={index} className="char__comics-item">
                 {item.name}
               </li>
