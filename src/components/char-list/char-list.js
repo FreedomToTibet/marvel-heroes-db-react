@@ -27,6 +27,7 @@ const CharList = (props) => {
 
 	const storageCharOffset = Number(sessionStorage.getItem('storageCharOffset'));
 	const storageCharList = JSON.parse(sessionStorage.getItem('storageCharList'));
+	const lastIndex = parseInt(sessionStorage.getItem('lastSelectedCharIndex'));
 
 	const [charList, setCharList] = useState(!storageCharList ? [] : storageCharList);
 	const [newItemsLoading, setNewItemLoading] = useState(false);
@@ -84,9 +85,9 @@ const CharList = (props) => {
   const itemRefs = useRef([]);
 
   const focusOnItem = (id) => {
-    itemRefs.current.forEach((item) => item.classList.remove('char__item_selected'));
-    itemRefs.current[id].classList.add('char__item_selected');
-    itemRefs.current[id].focus();
+			itemRefs.current.forEach(item => item.classList.remove('char__item_selected'));
+			itemRefs.current[id].classList.add('char__item_selected');
+			itemRefs.current[id].focus();
   };
 
   function renderItems (arr) {
@@ -100,20 +101,24 @@ const CharList = (props) => {
         imgStyle = {objectFit: 'unset'};
       }
 
+			const initialClass = lastIndex === i ? 'char__item char__item_selected' : 'char__item';
+
       return (
         <li
-          className="char__item"
+          className={initialClass}
           key={item.id}
           tabIndex={0}
           ref={element => itemRefs.current[i] = element}
           onClick={() => {
             props.onCharSelected(item.id);
             focusOnItem(i);
+						sessionStorage.setItem('lastSelectedCharIndex', i);
           }}
           onKeyDown={(e) => {
             if (e.key === ' ' || e.key === 'Enter') {
               props.onCharSelected(item.id);
               focusOnItem(i);
+							sessionStorage.setItem('lastSelectedCharIndex', i);
             }
           }}
         >
