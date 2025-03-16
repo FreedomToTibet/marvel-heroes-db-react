@@ -43,6 +43,7 @@ const CharList = (props) => {
 		const savedScrollPosition = sessionStorage.getItem('scrollCharPosition');
 		if (savedScrollPosition) {
 			try {
+				console.log("Scrolling to:", savedScrollPosition);
 				const scrollY = parseInt(savedScrollPosition, 10);
 				window.scrollTo({
 					top: scrollY,
@@ -65,6 +66,14 @@ const CharList = (props) => {
     getAllCharacters(offset)
       .then(onCharListLoaded)
 			.then(() => setProcess('confirmed'))
+			.then(() => {
+				setTimeout(() => {
+					window.scrollTo({
+						top: document.documentElement.scrollHeight,
+						behavior: 'smooth',
+					});
+				}, 100);
+			})
 			.then(returnScrollPosition);
   };
 

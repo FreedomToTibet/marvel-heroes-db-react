@@ -60,6 +60,12 @@ input::-webkit-inner-spin-button {
     }
 }
 
+.container {
+	max-width: 1140px;
+	margin: 0 auto;
+	// padding: 0 7px;
+}
+
 main {
     // margin-top: 50px;
     position: relative;

@@ -63,9 +63,18 @@ const ComicsList = () => {
 
   const onRequest = (offset, initial) => {
     initial ? setnewItemLoading(false) : setnewItemLoading(true);
+
     getAllComics(offset)
       .then(onComicsListLoaded)
       .then(() => setProcess('confirmed'))
+			.then(() => {
+				setTimeout(() => {
+					window.scrollTo({
+						top: document.documentElement.scrollHeight,
+						behavior: 'smooth',
+					});
+				}, 100);
+			})
       .then(returnScrollPosition);
   };
 
@@ -113,7 +122,10 @@ const ComicsList = () => {
         disabled={newItemLoading}
         style={{display: comicsEnded ? 'none' : 'block'}}
         className="button button__main button__long"
-        onClick={() => onRequest(offset)}
+        onClick={() => {
+					onRequest(offset);
+					saveScrollPosition();
+				}}
       >
         <div className="inner">load more</div>
       </button>

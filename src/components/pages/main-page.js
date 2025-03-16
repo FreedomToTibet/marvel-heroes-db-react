@@ -5,6 +5,7 @@ import AppWrap from '../../wrapper/app-wrapper';
 import RandomChar from '../random-char';
 import CharList from '../char-list';
 import CharInfo from '../char-info';
+import FindCharacter from '../find-character';
 import ErrorBoundary from '../error-boundary';
 
 import decoration from '../../resources/img/vision.png';
@@ -25,6 +26,9 @@ const MainPage = () => {
       <ErrorBoundary>
         <RandomChar />
       </ErrorBoundary>
+			<ErrorBoundary>
+				<FindCharacter />
+			</ErrorBoundary>
       <div className="char__content">
         <ErrorBoundary>
           <CharList onCharSelected={onCharSelected} />
