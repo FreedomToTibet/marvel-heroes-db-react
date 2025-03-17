@@ -1,5 +1,4 @@
-import {useState, useMemo, useEffect, useRef} from 'react';
-import {Link} from 'react-router-dom';
+import {useState, useEffect, useRef} from 'react';
 import ReactDOM from 'react-dom';
 
 import useMarvelService from '../../services/marvel-service';
@@ -7,50 +6,55 @@ import useDebounce from '../../hooks/debounce.hook';
 
 import './find-character.scss';
 
-const FindCharacter = () => {
+const FindCharacter = ({onCharSelected}) => {
   const {loading, error, getCharacterbyNameInput} = useMarvelService();
   const [dnone, setDnone] = useState(true);
   const [input, setInput] = useState('');
   const [data, setData] = useState([]);
-	const inputRef = useRef(null);
-	const resultsRef = useRef(null);
+  const inputRef = useRef(null);
+  const resultsRef = useRef(null);
+  const clickInProgress = useRef(false);
 
   const debouncedData = useDebounce(input, 400);
 
   useEffect(() => {
     if (input === '') {
       setData([]);
+			return;
     }
     loadCharacterbyName(debouncedData);
     //eslint-disable-next-line
   }, [debouncedData]);
 
-	// Calculate and set dropdown height whenever the dropdown is shown
+  // Calculate and set dropdown height whenever the dropdown is shown
   useEffect(() => {
     if (!dnone && input && resultsRef.current) {
       calculateDropdownHeight();
-      
+
       // Recalculate on window resize
       window.addEventListener('resize', calculateDropdownHeight);
       return () => window.removeEventListener('resize', calculateDropdownHeight);
     }
   }, [dnone, input, data.length]);
 
-	// Function to calculate the available height
+  // Function to calculate the available height
   const calculateDropdownHeight = () => {
     if (inputRef.current) {
       // Get the input's position relative to the viewport
       const inputRect = inputRef.current.getBoundingClientRect();
-      
+
       // Calculate distance from input bottom to window bottom
       const distanceToBottom = window.innerHeight - inputRect.bottom - 20; // 20px buffer
-      
+
       // Set a minimum height
       const minHeight = 100;
       const maxHeight = Math.max(minHeight, distanceToBottom);
-      
+
       // Set the CSS variable
-      document.documentElement.style.setProperty('--dropdown-max-height', `${maxHeight}px`);
+      document.documentElement.style.setProperty(
+        '--dropdown-max-height',
+        `${maxHeight}px`,
+      );
     }
   };
 
@@ -94,10 +98,15 @@ const FindCharacter = () => {
     if (!name) {
       return;
     }
-    getCharacterbyNameInput(name).then((data) => setData(data));
+    getCharacterbyNameInput(name)
+      .then((data) => setData(data))
+      .catch((error) => console.error('Error loading character data:', error));
   };
 
   const onBlur = () => {
+    if (clickInProgress.current) {
+      return;
+    }
     setTimeout(() => setDnone(true), 150);
   };
 
@@ -105,18 +114,39 @@ const FindCharacter = () => {
     setDnone(false);
   };
 
-  const renderResults = useMemo(
-    () =>
-      data.map(({id, name, thumbnail}) => (
-        <Link to={`${id}`} key={name}>
-          <div className="findCharacter__results-wrapper">
-            <img src={thumbnail} alt={name} />
-            <div className="findCharacter__desc">{name}</div>
-          </div>
-        </Link>
-      )),
-    [data],
-  );
+  // Handle character selection
+  const handleCharacterSelect = (id) => {
+    clickInProgress.current = true;
+
+    setDnone(true);
+    setInput('');
+
+		if (inputRef.current) {
+			inputRef.current.blur();
+		}
+
+    setTimeout(() => {
+      onCharSelected(id);
+      sessionStorage.setItem('lastSelectedCharIndex', -1);
+      // Reset flag after processing
+      clickInProgress.current = false;
+    }, 50);
+  };
+
+  const renderResults = data.map(({id, name, thumbnail}) => (
+    <div
+      className="findCharacter__results-wrapper"
+      key={id}
+			onMouseDown={(e) => {
+        // Prevent the onBlur from firing
+        e.preventDefault();
+        handleCharacterSelect(id);
+      }}
+    >
+      <img src={thumbnail} alt={name} />
+      <div className="findCharacter__desc">{name}</div>
+    </div>
+  ));
 
   const noDisplay = dnone || !input ? 'none' : 'block';
 
@@ -135,9 +165,9 @@ const FindCharacter = () => {
       <section className="findCharacter">
         <div className="container">
           <div className="findCharacter__block">
-            <form>
+            <form onSubmit={(e) => e.preventDefault()}>
               <input
-								ref={inputRef}
+                ref={inputRef}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onBlur={onBlur}
@@ -149,7 +179,7 @@ const FindCharacter = () => {
               />
               {data.length === 0 ? null : (
                 <div
-									ref={resultsRef}
+                  ref={resultsRef}
                   className="findCharacter__results"
                   style={{animation: `fadeIn .4s`, display: noDisplay}}
                 >
@@ -164,7 +194,6 @@ const FindCharacter = () => {
             </div>
           ) : null}
         </div>
-        {/* {dnone ? null : <div className="findCharacter__overlay"></div>} */}
       </section>
       {renderOverlay()}
     </>

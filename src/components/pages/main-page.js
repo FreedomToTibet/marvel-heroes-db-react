@@ -27,7 +27,7 @@ const MainPage = () => {
         <RandomChar />
       </ErrorBoundary>
 			<ErrorBoundary>
-				<FindCharacter />
+				<FindCharacter onCharSelected={onCharSelected} />
 			</ErrorBoundary>
       <div className="char__content">
         <ErrorBoundary>
