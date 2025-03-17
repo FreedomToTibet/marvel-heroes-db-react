@@ -36,23 +36,38 @@ const ComicsList = () => {
   const [newItemLoading, setnewItemLoading] = useState(false);
   const [offset, setOffset] = useState(!storageComicsOffset ? 0 : storageComicsOffset);
   const [comicsEnded, setComicsEnded] = useState(false);
+	const [initialLoad, setInitialLoad] = useState(true);
 
   useEffect(() => {
-    onRequest(offset, true);
+    if (storageComicsList && storageComicsList.length > 0) {
+      setProcess('confirmed');
+      setTimeout(() => {
+        returnScrollPosition();
+      }, 200);
+    } else {
+      // Otherwise, load comics for the first time
+      onRequest(offset, true);
+    }
     // eslint-disable-next-line
   }, []);
 
   const returnScrollPosition = () => {
     const savedScrollPosition = sessionStorage.getItem('scrollComicPosition');
 
-    try {
-      const scrollY = parseInt(savedScrollPosition, 10);
-      window.scrollTo({
-        top: scrollY,
-        behavior: 'smooth',
-      });
-    } catch (e) {
-      console.error('Scroll error:', e);
+    if (savedScrollPosition) {
+      try {
+        setTimeout(() => {
+          const scrollY = parseInt(savedScrollPosition, 10);
+          if (!isNaN(scrollY)) {
+            window.scrollTo({
+              top: scrollY,
+              behavior: 'smooth',
+            });
+          }
+        }, 100);
+      } catch (e) {
+        console.error('Scroll error:', e);
+      }
     }
   };
 
@@ -68,14 +83,16 @@ const ComicsList = () => {
       .then(onComicsListLoaded)
       .then(() => setProcess('confirmed'))
 			.then(() => {
-				setTimeout(() => {
-					window.scrollTo({
-						top: document.documentElement.scrollHeight,
-						behavior: 'smooth',
-					});
-				}, 100);
+				if (!initial && !initialLoad) {
+					setTimeout(() => {
+						window.scrollTo({
+							top: document.documentElement.scrollHeight,
+							behavior: 'smooth',
+						});
+					}, 100);
+				}
+				setInitialLoad(false);
 			})
-      .then(returnScrollPosition);
   };
 
   const onComicsListLoaded = (newComicsList) => {
@@ -83,12 +100,21 @@ const ComicsList = () => {
     if (newComicsList.length < 8) {
       ended = true;
     }
-    setComicsList([...comicsList, ...newComicsList]);
+
+		const updatedList = [...comicsList, ...newComicsList];
+    setComicsList(updatedList);
+
     setnewItemLoading(false);
-    setOffset(offset + 8);
-    sessionStorage.setItem('storageComicsOffset', offset);
-    sessionStorage.setItem('storageComicsList', JSON.stringify(comicsList));
+
+		const newOffset = offset + 9;
+    setOffset(newOffset);
+
+    sessionStorage.setItem('storageComicsOffset', newOffset);
+    sessionStorage.setItem('storageComicsList', JSON.stringify(updatedList));
+
     setComicsEnded(ended);
+
+		return newComicsList;
   };
 
   function renderItems(arr) {

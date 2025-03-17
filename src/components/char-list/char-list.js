@@ -31,24 +31,36 @@ const CharList = (props) => {
 
 	const [charList, setCharList] = useState(!storageCharList ? [] : storageCharList);
 	const [newItemsLoading, setNewItemLoading] = useState(false);
-	const [offset, setOffset] = useState(!storageCharOffset ? 210 : storageCharOffset);
+	const [offset, setOffset] = useState(!storageCharOffset ? 0 : storageCharOffset);
 	const [charListEnded, setCharListEnded] = useState(false);
+	const [initialLoad, setInitialLoad] = useState(true);
 
 	useEffect(() => {
-		onRequest(offset, true);
-		// eslint-disable-next-line
-	}, []);
+    if (storageCharList && storageCharList.length > 0) {
+			setProcess('confirmed');
+			setTimeout(() => {
+				returnScrollPosition();
+			}, 200);
+    } else {
+      // Otherwise, load characters for the first time
+      onRequest(offset, true);
+    }
+    // eslint-disable-next-line
+  }, []);
 
 	const returnScrollPosition = () => {
 		const savedScrollPosition = sessionStorage.getItem('scrollCharPosition');
 		if (savedScrollPosition) {
 			try {
-				console.log("Scrolling to:", savedScrollPosition);
-				const scrollY = parseInt(savedScrollPosition, 10);
-				window.scrollTo({
-					top: scrollY,
-					behavior: 'smooth'
-				});
+				setTimeout(() => {
+					const scrollY = parseInt(savedScrollPosition, 10);
+					if (!isNaN(scrollY)) {
+						window.scrollTo({
+							top: scrollY,
+							behavior: 'smooth',
+						});
+					}
+				}, 100);
 			} catch (e) {
 				console.error("Scroll error:", e);
 			}
@@ -67,14 +79,16 @@ const CharList = (props) => {
       .then(onCharListLoaded)
 			.then(() => setProcess('confirmed'))
 			.then(() => {
-				setTimeout(() => {
-					window.scrollTo({
-						top: document.documentElement.scrollHeight,
-						behavior: 'smooth',
-					});
-				}, 100);
+				if (!initial && !initialLoad) {
+          setTimeout(() => {
+            window.scrollTo({
+              top: document.documentElement.scrollHeight,
+              behavior: 'smooth',
+            });
+          }, 100);
+        }
+				setInitialLoad(false);
 			})
-			.then(returnScrollPosition);
   };
 
   const onCharListLoaded = (newCharList) => {
@@ -83,12 +97,20 @@ const CharList = (props) => {
       ended = true;
     }
 
-		setCharList(charList => [...charList, ...newCharList]);
-		setNewItemLoading(newItemsLoading => false);
-		setOffset(offset => offset + 9);
-		sessionStorage.setItem('storageCharOffset', offset);
-		sessionStorage.setItem('storageCharList', JSON.stringify(charList));
-		setCharListEnded(charListEnded => ended);
+		const updatedList = [...charList, ...newCharList];
+		setCharList(updatedList);
+
+		setNewItemLoading(false);
+
+		const newOffset = offset + 9;
+    setOffset(newOffset);
+
+		sessionStorage.setItem('storageCharOffset', newOffset);
+    sessionStorage.setItem('storageCharList', JSON.stringify(updatedList));
+
+		setCharListEnded(ended);
+
+		return newCharList;
   };
 
   const itemRefs = useRef([]);
