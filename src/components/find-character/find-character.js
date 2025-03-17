@@ -2,7 +2,7 @@ import {useState, useEffect, useRef} from 'react';
 import ReactDOM from 'react-dom';
 
 import useMarvelService from '../../services/marvel-service';
-import useDebounce from '../../hooks/debounce.hook';
+import useDebounce from '../../hooks/debounce-hook';
 
 import './find-character.scss';
 

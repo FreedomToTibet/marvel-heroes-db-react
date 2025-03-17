@@ -53,7 +53,7 @@ const RandomChar = () => {
 };
 
 const CharView = ({data}) => {
-  const {name, description, thumbnail, homepage, wiki, id} = data;
+  const {name, description, thumbnail, id} = data;
 
   /* Finding the image's name */
   /* const imgRegExp = /http:\/\/(.*)\/(.*)/;
@@ -77,24 +77,6 @@ const CharView = ({data}) => {
       <div className="randomchar__info">
         <p className="randomchar__name">{name}</p>
         <p className="randomchar__descr">{description}</p>
-        <div className="randomchar__btns">
-          <a
-            href={homepage}
-            target="_blank"
-            rel="noreferrer"
-            className="button button__main"
-          >
-            <div className="inner">homepage</div>
-          </a>
-          <a
-            href={wiki}
-            target="_blank"
-            rel="noreferrer"
-            className="button button__secondary"
-          >
-            <div className="inner">Wiki</div>
-          </a>
-        </div>
       </div>
     </div>
   );

@@ -61,7 +61,7 @@ const CharInfo = ({charId}) => {
 };
 
 const CharDetailsView = ({data}) => {
-  const {name, description, thumbnail, homepage, wiki, comics, charId} = data;
+  const {name, description, thumbnail, comics, charId} = data;
   let imgStyle = {objectFit: 'cover'};
 
 	const saveScrollPosition = () => {
@@ -91,24 +91,6 @@ const CharDetailsView = ({data}) => {
       </Link>
         <div>
           <div className="char__info-name">{name}</div>
-          <div className="char__btns">
-            <a
-              href={homepage}
-              target="_blank"
-              rel="noreferrer"
-              className="button button__main"
-            >
-              <div className="inner">homepage</div>
-            </a>
-            <a
-              href={wiki}
-              target="_blank"
-              rel="noreferrer"
-              className="button button__secondary"
-            >
-              <div className="inner">Wiki</div>
-            </a>
-          </div>
         </div>
       </div>
       <div className="char__descr">{description}</div>
