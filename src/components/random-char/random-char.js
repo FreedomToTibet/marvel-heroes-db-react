@@ -1,8 +1,8 @@
-import React, {useEffect, useState} from 'react';
-import {Link} from 'react-router-dom';
+import React, {useEffect, useState, useContext} from 'react';
 
 import useMarvelService from '../../services/marvel-service';
 import setContent from '../../utils/set-content';
+import {CharacterContext} from '../../context/character-context';
 
 import './random-char.scss';
 import mjolnir from '../../resources/img/mjolnir.png';
@@ -54,18 +54,32 @@ const RandomChar = () => {
 
 const CharView = ({data}) => {
   const {name, description, thumbnail, id} = data;
-
-  /* Finding the image's name */
-  /* const imgRegExp = /http:\/\/(.*)\/(.*)/;
-	const imgName = thumbnail.match(imgRegExp)[2]; */
+	const {onCharSelected} = useContext(CharacterContext);
 
   const imgAvailable = thumbnail.includes('image_not_available');
 
+	const handleCharacterSelect = () => {
+    onCharSelected(id);
+    
+    const charContent = document.querySelector('.char__content');
+    if (charContent) {
+      setTimeout(() => {
+        charContent.scrollIntoView({
+          behavior: 'smooth', 
+          block: 'start'
+        });
+      }, 50);
+    }
+    
+    // Clear any previous selections
+    sessionStorage.setItem('lastSelectedCharIndex', -1);
+  };
+
   return (
     <div className="randomchar__block">
-			<Link 
-				to={`/characters/${id}`}
-				onClick={() => sessionStorage.setItem('scrollPosition', null)}
+			<div 
+				onClick={handleCharacterSelect}
+        style={{cursor: 'pointer'}}
 			>
 			<img
         src={thumbnail}
@@ -73,7 +87,7 @@ const CharView = ({data}) => {
         className="randomchar__img"
         style={{objectFit: imgAvailable ? 'contain' : 'cover'}}
       />
-      </Link>
+      </div>
       <div className="randomchar__info">
         <p className="randomchar__name">{name}</p>
         <p className="randomchar__descr">{description}</p>
