@@ -50,12 +50,13 @@ const AppWrap = (Component) =>
             style={{
               cursor: 'pointer',
               position: 'fixed',
-              bottom: '10%',
-              left: '2%',
+              bottom: '12VH',
+              left: '2VW',
 							fontSize: '40px',
               visibility: isVisible ? 'visible' : 'hidden',
 							transform: isHoveredTop ? 'scale(1.1)' : 'scale(1)',
   						transition: 'transform 0.2s ease-in-out',
+							zIndex: 1000,
             }}
           >
             <FontAwesomeIcon 
@@ -73,12 +74,13 @@ const AppWrap = (Component) =>
             style={{
               cursor: 'pointer',
               position: 'fixed',
-              bottom: '2%',
-              left: '2%',
+              bottom: '2VH',
+              left: '2VW',
 							fontSize: '40px',
               visibility: isVisible ? 'visible' : 'hidden',
 							transform: isHoveredBottom ? 'scale(1.1)' : 'scale(1)',
   						transition: 'transform 0.2s ease-in-out',
+							zIndex: 1000,
             }}
           >
             <FontAwesomeIcon 

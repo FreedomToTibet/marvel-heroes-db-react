@@ -4,32 +4,52 @@
 	&__content {
 		margin-top: 50px;
 		display: grid;
-		grid-template-columns: 650px 425px;
-		column-gap: 25px;
+		grid-template-columns: minmax(350px, 3fr) minmax(300px, 1fr);
+		column-gap: 2vw;
 		align-items: start;
+
+		@media (max-width: 1100px) {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto auto;
+      row-gap: 2rem;
+    }
 	}
 
 	&__grid {
 		display: grid;
-		grid-template-columns: repeat(3, 200px);
-		column-gap: 25px;
-		row-gap: 30px;
+		grid-template-columns: repeat(3, 1fr);
+		gap: 1.2rem;
+		justify-content: center;
+
+		@media (max-width: 850px) {
+      grid-template-columns: repeat(2, 1fr);
+			gap: 1.2rem;
+			justify-content: space-around;
+    }
+    
+    @media (max-width: 620px) {
+      grid-template-columns: 200px;
+    }
 	}
 
 	&__item {
-		width: 200px;
-		height: 318px;
+		width: 100%;
+		max-width: 200px;
+		height: auto;
+		min-height: 318px;
 		background-color: $dark;
 		box-shadow: 5px 5px 10px rgba(0, 0, 0, .25);
-		padding: 15px;
+		padding: 0.8rem;
 		cursor: pointer;
 		transition: 0.3s transform;
+		margin: 0 auto;
 
 		img {
-			width: 200px;
-			height: 200px;
+			width: 100%;
+			height: auto;
+			aspect-ratio: 1/1; // Maintain square aspect ratio
 			object-fit: cover;
-			transform: translate(-15px, -15px);
+			transform: translate(-0.8rem, -0.8rem); 
 		}
 
 		&_selected {
@@ -40,7 +60,7 @@
 
 	&__name {
 		font-weight: bold;
-		font-size: 22px;
+		font-size: 1.3rem;
 		line-height: 29px;
 		text-transform: uppercase;
 		color: #fff;
