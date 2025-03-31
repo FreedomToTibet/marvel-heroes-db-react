@@ -96,7 +96,7 @@ const CharDetailsView = ({data}) => {
       <div className="char__descr">{description}</div>
       <div className="char__comics">Comics:</div>
       <ul className="char__comics-list">
-        {!!comics.length ? null : "Oops! There're no any comics with this hero."}
+        {!!comics.length ? null : "Oops! There're no comics with this hero."}
         {comics.slice(0, 10).map((item, index) => {
           // const comicId = item.resourceURI.substring(43);
           const comicId = item.resourceURI.split('/').pop();

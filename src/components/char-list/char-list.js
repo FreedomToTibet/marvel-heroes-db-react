@@ -43,7 +43,7 @@ const CharList = (props) => {
   const [inputValue, setInputValue] = useState(pageNumber);
   const [isInputFocused, setIsInputFocused] = useState(false);
 
-	const [requestedPage, setRequestedPage] = useState(null);
+  const [requestedPage, setRequestedPage] = useState(null);
 
   useEffect(() => {
     if (storageCharList && storageCharList.length > 0) {
@@ -58,16 +58,16 @@ const CharList = (props) => {
     // eslint-disable-next-line
   }, []);
 
-	useEffect(() => {
-		if (!isInputFocused && !requestedPage) {
-			const calculatedPage = Math.ceil(offset / 9);
-			
-			if (calculatedPage > 0) {
-				setPageNumber(calculatedPage);
-				setInputValue(calculatedPage.toString());
-			}
-		}
-	}, [offset, isInputFocused, requestedPage]);
+  useEffect(() => {
+    if (!isInputFocused && !requestedPage) {
+      const calculatedPage = Math.ceil(offset / 9);
+
+      if (calculatedPage > 0) {
+        setPageNumber(calculatedPage);
+        setInputValue(calculatedPage.toString());
+      }
+    }
+  }, [offset, isInputFocused, requestedPage]);
 
   const returnScrollPosition = () => {
     const savedScrollPosition = sessionStorage.getItem('scrollCharPosition');
@@ -94,17 +94,16 @@ const CharList = (props) => {
   };
 
   const onRequest = (offsetVal, initial) => {
-
     initial ? setNewItemLoading(false) : setNewItemLoading(true);
 
-		if (!initial) {
-			setRequestedPage(null);
-		}
+    if (!initial) {
+      setRequestedPage(null);
+    }
 
     getAllCharacters(offsetVal)
-      .then(newCharList => {
-				return onCharListLoaded(newCharList, offsetVal);
-			})
+      .then((newCharList) => {
+        return onCharListLoaded(newCharList, offsetVal);
+      })
       .then(() => setProcess('confirmed'))
       .then(() => {
         if (!initial && !initialLoad) {
@@ -131,9 +130,9 @@ const CharList = (props) => {
     setNewItemLoading(false);
 
     const itemCount = newCharList.length;
-  	const newOffset = currentOffset + itemCount;
+    const newOffset = currentOffset + itemCount;
 
-  setOffset(newOffset);
+    setOffset(newOffset);
 
     sessionStorage.setItem('storageCharOffset', newOffset);
     sessionStorage.setItem('storageCharList', JSON.stringify(updatedList));
@@ -144,7 +143,6 @@ const CharList = (props) => {
   };
 
   const jumpToPage = () => {
-
     setJumpError('');
 
     if (pageNumber < 1) {
@@ -152,7 +150,7 @@ const CharList = (props) => {
       return;
     }
 
-		setRequestedPage(pageNumber);
+    setRequestedPage(pageNumber);
 
     const newOffset = (pageNumber - 1) * 9;
 
@@ -163,9 +161,9 @@ const CharList = (props) => {
     sessionStorage.removeItem('storageCharOffset');
     sessionStorage.removeItem('lastSelectedCharIndex');
 
-		setOffset(newOffset);
+    setOffset(newOffset);
 
-		onRequest(newOffset, true);
+    onRequest(newOffset, true);
 
     window.scrollTo({
       top: 0,
@@ -188,20 +186,25 @@ const CharList = (props) => {
     setInputValue('');
   };
 
-  const handleInputBlur = () => {
-		setIsInputFocused(false);
-		if (inputValue === '') {
-			setInputValue(pageNumber.toString());
-		} else {
-			const numValue = parseInt(inputValue) || 1;
-			setPageNumber(numValue);
-			setInputValue(numValue.toString());
+  const handleInputBlur = (e) => {
+    // Check if the related target is the jump button
+    if (e.relatedTarget && e.relatedTarget.classList.contains('char__jump-btn')) {
+      return; // Don't do anything if we're clicking the button
+    }
 
-			if (numValue !== pageNumber) {
-				setRequestedPage(numValue);
-			}
-		}
-	};
+    setIsInputFocused(false);
+    if (inputValue === '') {
+      setInputValue(pageNumber.toString());
+    } else {
+      const numValue = parseInt(inputValue) || 1;
+      setPageNumber(numValue);
+      setInputValue(numValue.toString());
+
+      if (numValue !== pageNumber) {
+        setRequestedPage(numValue);
+      }
+    }
+  };
 
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') {
@@ -277,7 +280,7 @@ const CharList = (props) => {
             onChange={handleInputChange}
             onFocus={handleInputFocus}
             onBlur={handleInputBlur}
-            onKeyPress={handleKeyPress}
+            onKeyDown={handleKeyPress}
             placeholder="Page #"
             className="char__jump-input"
           />

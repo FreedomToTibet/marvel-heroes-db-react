@@ -1,43 +1,51 @@
 import {useHttp} from '../hooks/http-hook';
+import md5 from 'md5';
 
 const useMarvelService = () => {
   const {request, clearError, process, setProcess} = useHttp();
 
-  const _apiBase = 'https://gateway.marvel.com:443/v1/public/';
-  const _apiKey = 'apikey=09914633d73cae02fd803d05314996ce';
+	const _apiBase = 'https://gateway.marvel.com/v1/public/';
+  const _publicKey = '09914633d73cae02fd803d05314996ce';
+  const _privateKey = '1d3dafa314cc3f241f57f34acfe8db519328b47c';
   const _baseOffset = 210;
+
+	const _getAuthParams = () => {
+    const ts = 1;
+    const hash = md5(ts + _privateKey + _publicKey);
+    return `ts=${ts}&apikey=${_publicKey}&hash=${hash}`;
+  };
 
   const getAllCharacters = async (offset = _baseOffset) => {
     const result = await request(
-      `${_apiBase}characters?limit=9&offset=${offset}&${_apiKey}`,
+      `${_apiBase}characters?limit=9&offset=${offset}&${_getAuthParams()}`,
     );
     return result.data.results.map(_transformCharacter);
   };
 
 	const getCharacterByName = async (name) => {
-		const res = await request(`${_apiBase}characters?name=${name}&${_apiKey}`);
+		const res = await request(`${_apiBase}characters?name=${name}&${_getAuthParams()}`);
 		return res.data.results.map(_transformCharacter);
 	};
 
 	const getCharacterbyNameInput = async (pers) => {
-		const res = await request(`${_apiBase}characters?nameStartsWith=${pers}&orderBy=name&${_apiKey}`);
+		const res = await request(`${_apiBase}characters?nameStartsWith=${pers}&orderBy=name&${_getAuthParams()}`);
 		return res.data.results.map(_transformCharacter);
 	};
 
   const getCharacter = async (id) => {
-    const result = await request(`${_apiBase}characters/${id}?${_apiKey}`);
+    const result = await request(`${_apiBase}characters/${id}?${_getAuthParams()}`);
     return _transformCharacter(result.data.results[0]);
   };
 
   const getAllComics = async (offset = 0) => {
     const res = await request(
-      `${_apiBase}comics?orderBy=issueNumber&limit=8&offset=${offset}&${_apiKey}`,
+      `${_apiBase}comics?orderBy=issueNumber&limit=8&offset=${offset}&${_getAuthParams()}`,
     );
     return res.data.results.map(_transformComic);
   };
 
   const getComic = async (id) => {
-    const res = await request(`${_apiBase}comics/${id}?${_apiKey}`);
+    const res = await request(`${_apiBase}comics/${id}?${_getAuthParams()}`);
     return _transformComic(res.data.results[0]);
   };
 

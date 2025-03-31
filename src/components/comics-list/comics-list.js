@@ -106,7 +106,7 @@ const ComicsList = () => {
       setRequestedPage(null);
     }
 
-    getAllComics(offset)
+    getAllComics(offsetVal)
       .then((newComicsList) => {
         return onComicsListLoaded(newComicsList, offsetVal);
       })
@@ -197,7 +197,11 @@ const ComicsList = () => {
     setInputValue('');
   };
 
-  const handleInputBlur = () => {
+  const handleInputBlur = (e) => {
+		// Check if the related target is the jump button
+    if (e.relatedTarget && e.relatedTarget.classList.contains('comics__jump-btn')) {
+      return; // Don't do anything if we're clicking the button
+    }
     setIsInputFocused(false);
     if (inputValue === '') {
       setInputValue(pageNumber.toString());
