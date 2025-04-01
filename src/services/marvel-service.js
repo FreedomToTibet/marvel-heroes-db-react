@@ -4,9 +4,9 @@ import md5 from 'md5';
 const useMarvelService = () => {
   const {request, clearError, process, setProcess} = useHttp();
 
-	const _apiBase = 'https://gateway.marvel.com/v1/public/';
-  const _publicKey = '09914633d73cae02fd803d05314996ce';
-  const _privateKey = '1d3dafa314cc3f241f57f34acfe8db519328b47c';
+	const _apiBase = process.env.REACT_APP_API_BASE;
+  const _publicKey = process.env.REACT_APP_PUBLIC_KEY;
+  const _privateKey = process.env.REACT_APP_PRIVATE_KEY;
   const _baseOffset = 210;
 
 	const _getAuthParams = () => {
