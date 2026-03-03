@@ -1,7 +1,7 @@
 import React, {useState, useEffect, useRef, useMemo} from 'react';
 import PropTypes from 'prop-types';
 
-import useMarvelService from '../../services/marvel-service';
+import useComicVineService from '../../services/comicvine-service';
 import Spinner from '../spinner';
 import ErrorMessage from '../error-message';
 
@@ -23,7 +23,7 @@ const setContent = (process, Component, newItemsLoading) => {
 };
 
 const CharList = (props) => {
-  const {getAllCharacters, process, setProcess} = useMarvelService();
+  const {getAllCharacters, process, setProcess} = useComicVineService();
 
   const storageCharOffset = Number(sessionStorage.getItem('storageCharOffset'));
   const storageCharList = JSON.parse(sessionStorage.getItem('storageCharList'));

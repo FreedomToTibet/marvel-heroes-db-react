@@ -3,13 +3,13 @@ import PropTypes from 'prop-types';
 import {Link} from 'react-router-dom';
 
 import setContent from '../../utils/set-content';
-import useMarvelService from '../../services/marvel-service';
+import useComicVineService from '../../services/comicvine-service';
 
 import './char-info.scss';
 
 const CharInfo = ({charId}) => {
   const {getCharacter, clearError, process, setProcess} =
-    useMarvelService();
+    useComicVineService();
 
   const [char, setChar] = useState(null);
 
@@ -98,8 +98,7 @@ const CharDetailsView = ({data}) => {
       <ul className="char__comics-list">
         {!!comics.length ? null : "Oops! There're no comics with this hero."}
         {comics.slice(0, 10).map((item, index) => {
-          // const comicId = item.resourceURI.substring(43);
-          const comicId = item.resourceURI.split('/').pop();
+          const comicId = item.id;
 
           return (
             <Link 

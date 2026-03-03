@@ -1,13 +1,13 @@
 import {useState, useEffect, useRef} from 'react';
 import ReactDOM from 'react-dom';
 
-import useMarvelService from '../../services/marvel-service';
+import useComicVineService from '../../services/comicvine-service';
 import useDebounce from '../../hooks/debounce-hook';
 
 import './find-character.scss';
 
 const FindCharacter = ({onCharSelected}) => {
-  const {loading, error, getCharacterbyNameInput} = useMarvelService();
+  const {process, getCharacterbyNameInput} = useComicVineService();
   const [dnone, setDnone] = useState(true);
   const [input, setInput] = useState('');
   const [data, setData] = useState([]);
@@ -183,14 +183,14 @@ const FindCharacter = ({onCharSelected}) => {
                   className="findCharacter__results"
                   style={{animation: `fadeIn .4s`, display: noDisplay}}
                 >
-                  {loading ? 'loading ...' : renderResults}
+                  {process === 'loading' ? 'loading ...' : renderResults}
                 </div>
               )}
             </form>
           </div>
-          {error ? (
+          {process === 'error' ? (
             <div style={{fontWeight: 'bold', color: 'red'}}>
-              Unknow error, try search again
+              Unknown error, try search again
             </div>
           ) : null}
         </div>

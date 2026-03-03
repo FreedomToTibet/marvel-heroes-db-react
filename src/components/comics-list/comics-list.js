@@ -5,7 +5,7 @@ import ErrorMessage from '../error-message';
 import Spinner from '../spinner';
 import AppWrap from '../../wrapper/app-wrapper';
 
-import useMarvelService from '../../services/marvel-service';
+import useComicVineService from '../../services/comicvine-service';
 
 import './comics-list.scss';
 
@@ -25,7 +25,7 @@ const setContent = (process, Component, newItemLoading) => {
 };
 
 const ComicsList = () => {
-  const {getAllComics, process, setProcess} = useMarvelService();
+  const {getAllComics, process, setProcess} = useComicVineService();
 
   const storageComicsOffset = Number(sessionStorage.getItem('storageComicsOffset'));
   const storageComicsList = JSON.parse(sessionStorage.getItem('storageComicsList'));
