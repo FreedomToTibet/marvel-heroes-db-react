@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Transition } from 'react-transition-group';
 import './image-viewer.scss';
 
@@ -8,12 +8,14 @@ const ImageViewer = ({ src, alt, isOpen, onClose }) => {
   const [loading, setLoading] = useState(true);
   const [showViewer, setShowViewer] = useState(isOpen);
   const [fullSize, setFullSize] = useState(false);
+  const nodeRef = useRef(null);
 
   useEffect(() => {
     if (isOpen) {
       setShowViewer(true);
       // Reset to fit-to-screen mode when opening
       setFullSize(false);
+      setLoading(true);
     }
   }, [isOpen]);
 
@@ -48,7 +50,13 @@ const ImageViewer = ({ src, alt, isOpen, onClose }) => {
     setLoading(false);
   };
 
-  const handleClose = () => {
+  const handleClose = (e) => {
+    // Prevent event from bubbling to parent elements
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    
     if (fullSize) {
       setFullSize(false);
     } else {
@@ -57,12 +65,15 @@ const ImageViewer = ({ src, alt, isOpen, onClose }) => {
   };
 
   const toggleFullSize = (e) => {
+    e.preventDefault();
     e.stopPropagation();
     setFullSize(prev => !prev);
   };
 
   const handleExited = () => {
     setShowViewer(false);
+    setLoading(true);
+    setFullSize(false);
   };
 
   if (!showViewer) return null;
@@ -73,15 +84,22 @@ const ImageViewer = ({ src, alt, isOpen, onClose }) => {
       timeout={ANIMATION_DURATION}
       onExited={handleExited}
       unmountOnExit={false}
+      nodeRef={nodeRef}
     >
       {(state) => (
         <div 
+          ref={nodeRef}
           className={`image-viewer ${state} ${fullSize ? 'image-viewer--full-size' : ''}`} 
           onClick={handleClose}
+          onMouseDown={(e) => e.stopPropagation()}
         >
           <div 
             className="image-viewer__content" 
-            onClick={(e) => e.stopPropagation()}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+            }}
+            onMouseDown={(e) => e.stopPropagation()}
           >
             {loading && <div className="image-viewer__loading">Loading...</div>}
             <img 

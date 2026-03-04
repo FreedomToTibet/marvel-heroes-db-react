@@ -52,6 +52,11 @@
 			transform: translate(-0.8rem, -0.8rem); 
 		}
 
+		&:hover {
+			box-shadow: 0 5px 20px $main-color;
+			transform: translateY(-8px);
+		}
+
 		&_selected {
 			box-shadow: 0 5px 20px $main-color;
 			transform: translateY(-8px);
