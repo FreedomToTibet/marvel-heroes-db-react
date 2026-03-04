@@ -5,7 +5,7 @@ import ErrorMessage from '../error-message';
 import Spinner from '../spinner';
 import AppWrap from '../../wrapper/app-wrapper';
 
-import useMarvelService from '../../services/marvel-service';
+import useComicVineService from '../../services/comicvine-service';
 
 import './comics-list.scss';
 
@@ -25,7 +25,7 @@ const setContent = (process, Component, newItemLoading) => {
 };
 
 const ComicsList = () => {
-  const {getAllComics, process, setProcess} = useMarvelService();
+  const {getAllComics, process, setProcess} = useComicVineService();
 
   const storageComicsOffset = Number(sessionStorage.getItem('storageComicsOffset'));
   const storageComicsList = JSON.parse(sessionStorage.getItem('storageComicsList'));
@@ -107,8 +107,8 @@ const ComicsList = () => {
     }
 
     getAllComics(offsetVal)
-      .then((newComicsList) => {
-        return onComicsListLoaded(newComicsList, offsetVal);
+      .then(({results, total}) => {
+        return onComicsListLoaded(results, offsetVal, total);
       })
       .then(() => setProcess('confirmed'))
       .then(() => {
@@ -124,13 +124,12 @@ const ComicsList = () => {
       });
   };
 
-  const onComicsListLoaded = (newComicsList, currentOffset) => {
-    let ended = false;
-    if (newComicsList.length < 8) {
-      ended = true;
-    }
-
-    const updatedList = [...comicsList, ...newComicsList];
+  const onComicsListLoaded = (newComicsList, currentOffset, totalResults) => {
+    // Deduplicate comics by ID - Comic Vine API can return duplicate issues across pages
+    const existingIds = new Set(comicsList.map(comic => comic.id));
+    const uniqueNewComics = newComicsList.filter(comic => !existingIds.has(comic.id));
+    
+    const updatedList = [...comicsList, ...uniqueNewComics];
     setComicsList(updatedList);
 
     setnewItemLoading(false);
@@ -143,6 +142,8 @@ const ComicsList = () => {
     sessionStorage.setItem('storageComicsOffset', newOffset);
     sessionStorage.setItem('storageComicsList', JSON.stringify(updatedList));
 
+    // End pagination if we've loaded all available issues
+    const ended = newOffset >= totalResults;
     setComicsEnded(ended);
 
     return newComicsList;
@@ -224,13 +225,13 @@ const ComicsList = () => {
   };
 
   function renderItems(arr) {
-    const items = arr.map((item, i) => {
+    const items = arr.map((item) => {
       return (
-        <li className="comics__item" key={`${i + item.id}`}>
+        <li className="comics__item" key={item.id}>
           <Link to={`/comics/${item.id}`} onClick={saveScrollPosition}>
             <img src={item.thumbnail} alt={item.title} className="comics__item-img" />
             <div className="comics__item-name">{item.title}</div>
-            <div className="comics__item-price">{item.price}</div>
+            <div className="comics__item-price">Issue #{item.issueNumber}</div>
           </Link>
         </li>
       );

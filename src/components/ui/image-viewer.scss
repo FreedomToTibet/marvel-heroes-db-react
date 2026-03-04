@@ -22,17 +22,20 @@
   }
   
   &--full-size {
-    overflow: auto;
+    overflow-y: auto;
+    align-items: flex-start;
+    padding: 20px 0;
     
     .image-viewer__content {
       max-width: none;
       max-height: none;
       
       .image-viewer__img {
-        max-width: none;
+        max-width: 100vw;
         max-height: none;
         width: auto;
         height: auto;
+        display: block;
         transition: transform 0.3s ease;
       }
     }

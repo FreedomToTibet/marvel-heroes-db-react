@@ -1,14 +1,14 @@
 import React, {useState, useEffect} from 'react';
 import { useParams } from 'react-router-dom';
 
-import MarvelService from '../../services/marvel-service';
+import useComicVineService from '../../services/comicvine-service';
 import AppBanner from '../app-banner';
 import setContent from '../../utils/set-content';
 
 export const SinglePage = ({Component, dataType}) => {
 	const {id} = useParams();
 	const [data, setData] = useState(null);
-	const {clearError, getComic, getCharacter, process, setProcess} = MarvelService();
+	const {clearError, getComic, getCharacter, process, setProcess} = useComicVineService();
 
 	useEffect(() => {
 		updateData();

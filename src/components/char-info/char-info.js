@@ -3,13 +3,14 @@ import PropTypes from 'prop-types';
 import {Link} from 'react-router-dom';
 
 import setContent from '../../utils/set-content';
-import useMarvelService from '../../services/marvel-service';
+import useComicVineService from '../../services/comicvine-service';
+import ImageViewer from '../ui/image-viewer';
 
 import './char-info.scss';
 
 const CharInfo = ({charId}) => {
   const {getCharacter, clearError, process, setProcess} =
-    useMarvelService();
+    useComicVineService();
 
   const [char, setChar] = useState(null);
 
@@ -61,13 +62,25 @@ const CharInfo = ({charId}) => {
 };
 
 const CharDetailsView = ({data}) => {
-  const {name, description, thumbnail, comics, charId} = data;
+  const {name, description, thumbnail, fullSizeImage, comics, powers, charId} = data;
+  const [isImageViewerOpen, setIsImageViewerOpen] = useState(false);
   let imgStyle = {objectFit: 'cover'};
 
 	const saveScrollPosition = () => {
 		const scrollPosition = (window.scrollY || document.documentElement.scrollTop) + 100;
 		sessionStorage.setItem('scrollCharPosition', scrollPosition);
 	};
+
+  const openImageViewer = (e) => {
+    e.preventDefault();
+    if (fullSizeImage || !thumbnail.includes('placeholder')) {
+      setIsImageViewerOpen(true);
+    }
+  };
+
+  const closeImageViewer = () => {
+    setIsImageViewerOpen(false);
+  };
 
 	// if (!charId) {
 	// 	charId = sessionStorage.getItem('lastCharId');
@@ -87,33 +100,60 @@ const CharDetailsView = ({data}) => {
 				to={`/characters/${charId ? charId : sessionStorage.getItem('lastCharId')}`}
 				onClick={saveScrollPosition}
 			>
-				<img src={thumbnail} alt={name} style={imgStyle} />
+				<img 
+          src={thumbnail} 
+          alt={name} 
+          style={{...imgStyle, cursor: fullSizeImage ? 'zoom-in' : 'pointer'}} 
+          onClick={openImageViewer}
+        />
       </Link>
         <div>
           <div className="char__info-name">{name}</div>
         </div>
       </div>
       <div className="char__descr">{description}</div>
+      
+      {/* Powers Section */}
+      {powers && powers.length > 0 && (
+        <>
+          <div className="char__powers-label">Powers:</div>
+          <ul className="char__powers-list">
+            {powers.map((power) => (
+              <li key={power} className="char__powers-item">
+                {power}
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+      
       <div className="char__comics">Comics:</div>
       <ul className="char__comics-list">
         {!!comics.length ? null : "Oops! There're no comics with this hero."}
-        {comics.slice(0, 10).map((item, index) => {
-          // const comicId = item.resourceURI.substring(43);
-          const comicId = item.resourceURI.split('/').pop();
+        {comics.slice(0, 10).map((item) => {
+          // Comic Vine provides ID directly, no need to parse resourceURI
+          const comicId = item.id || item.resourceURI?.split('/').pop();
 
           return (
             <Link 
-							to={`/comics/${comicId}`} 
-							key={`${index + comicId}`}
-							onClick={saveScrollPosition}
-						>
-              <li key={index} className="char__comics-item">
+						to={`/comics/${comicId}`} 
+						key={comicId}
+						onClick={saveScrollPosition}
+					>
+              <li className="char__comics-item">
                 {item.name}
               </li>
             </Link>
           );
         })}
       </ul>
+
+      <ImageViewer 
+        src={fullSizeImage || thumbnail} 
+        alt={name} 
+        isOpen={isImageViewerOpen} 
+        onClose={closeImageViewer} 
+      />
     </>
   );
 };

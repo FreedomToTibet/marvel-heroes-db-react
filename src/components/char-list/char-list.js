@@ -1,7 +1,7 @@
 import React, {useState, useEffect, useRef, useMemo} from 'react';
 import PropTypes from 'prop-types';
 
-import useMarvelService from '../../services/marvel-service';
+import useComicVineService from '../../services/comicvine-service';
 import Spinner from '../spinner';
 import ErrorMessage from '../error-message';
 
@@ -23,7 +23,7 @@ const setContent = (process, Component, newItemsLoading) => {
 };
 
 const CharList = (props) => {
-  const {getAllCharacters, process, setProcess} = useMarvelService();
+  const {getAllCharacters, process, setProcess} = useComicVineService();
 
   const storageCharOffset = Number(sessionStorage.getItem('storageCharOffset'));
   const storageCharList = JSON.parse(sessionStorage.getItem('storageCharList'));
@@ -101,8 +101,8 @@ const CharList = (props) => {
     }
 
     getAllCharacters(offsetVal)
-      .then((newCharList) => {
-        return onCharListLoaded(newCharList, offsetVal);
+      .then(({results, total}) => {
+        return onCharListLoaded(results, offsetVal, total);
       })
       .then(() => setProcess('confirmed'))
       .then(() => {
@@ -118,13 +118,12 @@ const CharList = (props) => {
       });
   };
 
-  const onCharListLoaded = (newCharList, currentOffset) => {
-    let ended = false;
-    if (newCharList.length < 9) {
-      ended = true;
-    }
-
-    const updatedList = [...charList, ...newCharList];
+  const onCharListLoaded = (newCharList, currentOffset, totalResults) => {
+    // Deduplicate characters by ID - Comic Vine API can return duplicate characters across pages
+    const existingIds = new Set(charList.map(char => char.id));
+    const uniqueNewChars = newCharList.filter(char => !existingIds.has(char.id));
+    
+    const updatedList = [...charList, ...uniqueNewChars];
     setCharList(updatedList);
 
     setNewItemLoading(false);
@@ -137,6 +136,8 @@ const CharList = (props) => {
     sessionStorage.setItem('storageCharOffset', newOffset);
     sessionStorage.setItem('storageCharList', JSON.stringify(updatedList));
 
+    // End pagination if we've loaded all available characters
+    const ended = newOffset >= totalResults;
     setCharListEnded(ended);
 
     return newCharList;

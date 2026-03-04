@@ -1,41 +1,54 @@
 import {useState, useEffect, useRef} from 'react';
 import ReactDOM from 'react-dom';
 
-import useMarvelService from '../../services/marvel-service';
+import useComicVineService from '../../services/comicvine-service';
 import useDebounce from '../../hooks/debounce-hook';
 
 import './find-character.scss';
 
 const FindCharacter = ({onCharSelected}) => {
-  const {loading, error, getCharacterbyNameInput} = useMarvelService();
+  const {getCharacterbyNameInput} = useComicVineService();
   const [dnone, setDnone] = useState(true);
   const [input, setInput] = useState('');
   const [data, setData] = useState([]);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [searchError, setSearchError] = useState(null);
+  const [emptyResults, setEmptyResults] = useState(false);
   const inputRef = useRef(null);
   const resultsRef = useRef(null);
   const clickInProgress = useRef(false);
 
-  const debouncedData = useDebounce(input, 400);
+  const debouncedData = useDebounce(input, 300);
 
   useEffect(() => {
-    if (input === '') {
+    // Clear suggestions if input is less than 2 characters
+    if (input.length < 2) {
       setData([]);
+      setSearchLoading(false);
+      setSearchError(null);
+      setEmptyResults(false);
 			return;
     }
-    loadCharacterbyName(debouncedData);
+    // Only trigger API call when debounced value has 2+ characters
+    if (debouncedData && debouncedData.length >= 2) {
+      loadCharacterbyName(debouncedData);
+    }
     //eslint-disable-next-line
-  }, [debouncedData]);
+  }, [debouncedData, input]);
+
+  // Show dropdown if there's content to display
+  const shouldShowDropdown = !dnone && input.length >= 2 && (searchLoading || searchError || emptyResults || data.length > 0);
 
   // Calculate and set dropdown height whenever the dropdown is shown
   useEffect(() => {
-    if (!dnone && input && resultsRef.current) {
+    if (shouldShowDropdown && input && resultsRef.current) {
       calculateDropdownHeight();
 
       // Recalculate on window resize
       window.addEventListener('resize', calculateDropdownHeight);
       return () => window.removeEventListener('resize', calculateDropdownHeight);
     }
-  }, [dnone, input, data.length]);
+  }, [shouldShowDropdown, input, data.length, searchLoading, searchError, emptyResults]);
 
   // Function to calculate the available height
   const calculateDropdownHeight = () => {
@@ -95,12 +108,33 @@ const FindCharacter = ({onCharSelected}) => {
   }, [dnone]);
 
   const loadCharacterbyName = (name) => {
-    if (!name) {
+    if (!name || name.length < 2) {
       return;
     }
+    
+    // Set loading state before request
+    setSearchLoading(true);
+    setSearchError(null);
+    setEmptyResults(false);
+    
     getCharacterbyNameInput(name)
-      .then((data) => setData(data))
-      .catch((error) => console.error('Error loading character data:', error));
+      .then(({results}) => {
+        setData(results);
+        // Distinguish empty results from API error
+        if (results.length === 0) {
+          setEmptyResults(true);
+        } else {
+          setEmptyResults(false);
+        }
+        setSearchLoading(false);
+      })
+      .catch((error) => {
+        console.error('Error loading character data:', error);
+        setSearchError('Search unavailable, please try again');
+        setData([]);
+        setEmptyResults(false);
+        setSearchLoading(false);
+      });
   };
 
   const onBlur = () => {
@@ -148,7 +182,44 @@ const FindCharacter = ({onCharSelected}) => {
     </div>
   ));
 
-  const noDisplay = dnone || !input ? 'none' : 'block';
+  // Render dropdown content based on state
+  const renderDropdownContent = () => {
+    if (searchLoading) {
+      return (
+        <div className="findCharacter__status">
+          <div style={{textAlign: 'center', padding: '20px'}}>
+            Loading...
+          </div>
+        </div>
+      );
+    }
+    
+    if (searchError) {
+      return (
+        <div className="findCharacter__status">
+          <div style={{textAlign: 'center', padding: '20px', color: '#d32f2f'}}>
+            {searchError}
+          </div>
+        </div>
+      );
+    }
+    
+    if (emptyResults) {
+      return (
+        <div className="findCharacter__status">
+          <div style={{textAlign: 'center', padding: '20px', color: '#666'}}>
+            No characters found for '{input}'
+          </div>
+        </div>
+      );
+    }
+    
+    if (data.length > 0) {
+      return renderResults;
+    }
+    
+    return null;
+  };
 
   // creating portal for overlay
   const renderOverlay = () => {
@@ -176,23 +247,20 @@ const FindCharacter = ({onCharSelected}) => {
                 type="text"
                 autoComplete="off"
                 placeholder="find your favorite HERO"
+                disabled={searchLoading}
+                style={{opacity: searchLoading ? 0.6 : 1}}
               />
-              {data.length === 0 ? null : (
+              {shouldShowDropdown && (
                 <div
                   ref={resultsRef}
                   className="findCharacter__results"
-                  style={{animation: `fadeIn .4s`, display: noDisplay}}
+                  style={{animation: `fadeIn .4s`, display: 'block'}}
                 >
-                  {loading ? 'loading ...' : renderResults}
+                  {renderDropdownContent()}
                 </div>
               )}
             </form>
           </div>
-          {error ? (
-            <div style={{fontWeight: 'bold', color: 'red'}}>
-              Unknow error, try search again
-            </div>
-          ) : null}
         </div>
       </section>
       {renderOverlay()}

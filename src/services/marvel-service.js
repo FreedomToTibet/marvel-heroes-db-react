@@ -1,7 +1,48 @@
 import {useHttp} from '../hooks/http-hook';
-import md5 from 'md5';
+
+// Cache version for API migration - invalidates old Marvel API cache
+const CACHE_VERSION = 'cv_v1';
+
+// SessionStorage cache keys used by this service
+const CACHE_KEYS = [
+  'storageCharList',
+  'storageCharOffset',
+  'storageComicsList',
+  'storageComicsOffset',
+  'lastSelectedCharIndex',
+  'scrollCharPosition',
+  'scrollComicPosition'
+];
+
+// Flag to ensure cache validation runs only once per app session
+let cacheValidated = false;
+
+/**
+ * Validates cache version and clears old Marvel API cache if needed.
+ * This function runs once on first service initialization to ensure
+ * old Marvel-structured cache doesn't break the migrated Comic Vine app.
+ */
+const validateAndClearOldCache = () => {
+  const storedVersion = sessionStorage.getItem('apiCacheVersion');
+  
+  if (storedVersion !== CACHE_VERSION) {
+    // Clear all API-related cache keys
+    CACHE_KEYS.forEach(key => sessionStorage.removeItem(key));
+    
+    // Set new cache version
+    sessionStorage.setItem('apiCacheVersion', CACHE_VERSION);
+    
+    console.log(`Cache cleared: migrated from ${storedVersion || 'Marvel API'} to ${CACHE_VERSION}`);
+  }
+};
 
 const useMarvelService = () => {
+  // Validate and clear old cache once on first initialization
+  if (!cacheValidated) {
+    validateAndClearOldCache();
+    cacheValidated = true;
+  }
+
   const {request, clearError, process, setProcess} = useHttp();
 
 	const _apiBase = 'https://gateway.marvel.com/v1/public/';

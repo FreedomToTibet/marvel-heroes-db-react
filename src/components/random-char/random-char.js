@@ -1,6 +1,6 @@
 import React, {useEffect, useState, useContext} from 'react';
 
-import useMarvelService from '../../services/marvel-service';
+import useComicVineService from '../../services/comicvine-service';
 import setContent from '../../utils/set-content';
 import {CharacterContext} from '../../context/character-context';
 
@@ -9,7 +9,7 @@ import mjolnir from '../../resources/img/mjolnir.png';
 
 const RandomChar = () => {
   const [char, setChar] = useState(null);
-  const {getCharacter, clearError, process, setProcess} = useMarvelService();
+  const {getRandomCharacter, clearError, process, setProcess} = useComicVineService();
 
   useEffect(() => {
     updateChar();
@@ -27,8 +27,8 @@ const RandomChar = () => {
 
   const updateChar = () => {
     clearError();
-    const id = Math.floor(Math.random() * (1011400 - 1011000) + 1011000);
-    getCharacter(id)
+    // Use Comic Vine's random character method (single request with random offset)
+    getRandomCharacter()
       .then(onCharLoaded)
       .then(() => setProcess('confirmed'));
   };

@@ -3,14 +3,14 @@ import { Formik, Form, Field, ErrorMessage as FormikErrorMessage } from 'formik'
 import * as Yup from 'yup';
 import {Link} from 'react-router-dom';
 
-import useMarvelService from '../../services/marvel-service';
+import useComicVineService from '../../services/comicvine-service';
 import ErrorMessage from '../error-message';
 
 import './char-search-form.scss';
 
 const CharSearchForm = () => {
     const [char, setChar] = useState(null);
-    const {loading, error, getCharacterByName, clearError} = useMarvelService();
+    const {loading, error, getCharacterByName, clearError} = useComicVineService();
 
     const onCharLoaded = (char) => {
         setChar(char);
@@ -20,7 +20,7 @@ const CharSearchForm = () => {
         clearError();
 
         getCharacterByName(name)
-            .then(onCharLoaded);
+            .then(({results}) => onCharLoaded(results));
     }
 
     const errorMessage = error ? <div className="char__search-critical-error"><ErrorMessage /></div> : null;
