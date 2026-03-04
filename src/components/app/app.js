@@ -1,5 +1,6 @@
 import React, {lazy, Suspense} from 'react';
 import {BrowserRouter as Router, Route, Routes, Navigate} from 'react-router-dom';
+import { HelmetProvider } from 'react-helmet-async';
 
 import AppHeader from '../app-header';
 import SinglePage from '../pages/single-page';
@@ -15,8 +16,9 @@ const SingleCharacterLayout = lazy(() => import('../pages/single-character-layou
 const App = () => {
 	
   return (
-    <Router>
-      <div className="app">
+    <HelmetProvider>
+      <Router>
+        <div className="app">
         <AppHeader />
         <main>
           <Suspense fallback={<Spinner/>}>
@@ -30,8 +32,9 @@ const App = () => {
             </Routes>
           </Suspense>
         </main>
-      </div>
-    </Router>
+        </div>
+      </Router>
+    </HelmetProvider>
   );
 };
 

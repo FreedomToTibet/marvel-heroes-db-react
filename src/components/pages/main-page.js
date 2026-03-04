@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import {Helmet} from 'react-helmet';
+import {Helmet} from 'react-helmet-async';
 import AppWrap from '../../wrapper/app-wrapper';
 
 import RandomChar from '../random-char';

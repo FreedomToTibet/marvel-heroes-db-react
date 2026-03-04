@@ -1,4 +1,4 @@
-import {Helmet} from 'react-helmet';
+import {Helmet} from 'react-helmet-async';
 
 import ComicsList from '../comics-list';
 import AppBanner from '../app-banner';
