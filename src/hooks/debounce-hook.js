@@ -8,7 +8,7 @@ const useDebounce = (value, delay) => {
             setState(value)
         },delay)
         return () => clearTimeout(debounce)
-    },[value])
+    },[value, delay])
 
     return state
 }

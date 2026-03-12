@@ -1,4 +1,4 @@
-import {useState, useEffect, useRef} from 'react';
+import {useState, useEffect, useRef, useDeferredValue} from 'react';
 import ReactDOM from 'react-dom';
 
 import useComicVineService from '../../services/comicvine-service';
@@ -18,23 +18,28 @@ const FindCharacter = ({onCharSelected}) => {
   const resultsRef = useRef(null);
   const clickInProgress = useRef(false);
 
-  const debouncedData = useDebounce(input, 300);
+  // React 19: Defer input updates for better UI responsiveness during fast typing
+  const deferredInput = useDeferredValue(input);
+  // Debounce API calls to limit request frequency (600ms pause after typing stops)
+  const debouncedQuery = useDebounce(deferredInput, 600);
 
+  // Effect 1: Immediate clearing when input drops below 2 characters
   useEffect(() => {
-    // Clear suggestions if input is less than 2 characters
     if (input.length < 2) {
       setData([]);
       setSearchLoading(false);
       setSearchError(null);
       setEmptyResults(false);
-			return;
     }
-    // Only trigger API call when debounced value has 2+ characters
-    if (debouncedData && debouncedData.length >= 2) {
-      loadCharacterbyName(debouncedData);
+  }, [input]);
+
+  // Effect 2: Debounced API calls when query is valid
+  useEffect(() => {
+    if (debouncedQuery && debouncedQuery.length >= 2) {
+      loadCharacterbyName(debouncedQuery);
     }
     //eslint-disable-next-line
-  }, [debouncedData, input]);
+  }, [debouncedQuery]);
 
   // Show dropdown if there's content to display
   const shouldShowDropdown = !dnone && input.length >= 2 && (searchLoading || searchError || emptyResults || data.length > 0);
