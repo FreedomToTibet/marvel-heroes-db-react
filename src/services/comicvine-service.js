@@ -69,9 +69,9 @@ const useComicVineService = () => {
 
   const { request, clearError, process, setProcess } = useHttp();
 
-  // Use proxy to avoid CORS issues - setupProxy.js routes /api/vine to Comic Vine API
+  // Use proxy to avoid CORS issues - vite.config.js routes /api/vine to Comic Vine API
   const _apiBase = '/api/vine/';
-  const _apiKey = window._env_?.REACT_APP_COMICVINE_API_KEY;
+  const _apiKey = import.meta.env.VITE_COMICVINE_API_KEY;
 
   /**
    * Returns authentication parameters as an object for URLSearchParams.

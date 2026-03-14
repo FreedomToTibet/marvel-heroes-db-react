@@ -10,7 +10,7 @@ const ErrorMessage = () => {
 						objectFit: 'contain', 
 						margin: "0 auto"
 				}}  
-				src={process.env.PUBLIC_URL + '/error.gif'} 
+				src="/error.gif" 
 				alt="Error"
 		/>
 )
