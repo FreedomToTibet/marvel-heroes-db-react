@@ -179,20 +179,6 @@ const useComicVineService = () => {
     const data = checkComicVineResponse(json);
     const transformed = _transformCharacterDetail(data);
     
-    // Verification logging for Step 8
-    console.log('🔍 getCharacter verification:', {
-      characterId: id,
-      descriptionType: typeof transformed.description,
-      descriptionSample: transformed.description.substring(0, 100) + '...',
-      hasHtmlTags: /<[^>]*>/.test(transformed.description),
-      powersType: Array.isArray(transformed.powers) ? 'array' : typeof transformed.powers,
-      powersCount: transformed.powers.length,
-      powersSample: transformed.powers.slice(0, 3),
-      allPowersAreStrings: transformed.powers.every(p => typeof p === 'string'),
-      comicsCount: transformed.comics.length,
-      comicsSample: transformed.comics.slice(0, 2)
-    });
-    
     return transformed;
   };
 
