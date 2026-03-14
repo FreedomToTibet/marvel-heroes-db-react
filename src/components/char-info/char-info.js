@@ -5,6 +5,7 @@ import {Link} from 'react-router-dom';
 import setContent from '../../utils/set-content';
 import useComicVineService from '../../services/comicvine-service';
 import ImageViewer from '../ui/image-viewer';
+import { isValidImage } from '../../utils/html-utils';
 
 import './char-info.scss';
 
@@ -86,10 +87,8 @@ const CharDetailsView = ({data}) => {
 	// 	charId = sessionStorage.getItem('lastCharId');
 	// }
 
-  if (
-    thumbnail.includes('image_not_available') ||
-    thumbnail.includes('4c002e0305708.gif')
-  ) {
+  // Use Comic Vine image validation instead of Marvel-specific checks
+  if (!isValidImage(thumbnail)) {
     imgStyle = {objectFit: 'unset'};
   }
 

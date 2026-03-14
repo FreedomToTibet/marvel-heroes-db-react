@@ -1,9 +1,9 @@
 import React, {useState, useEffect, useMemo} from 'react';
-import {Link} from 'react-router-dom';
 
 import ErrorMessage from '../error-message';
 import Spinner from '../spinner';
 import AppWrap from '../../wrapper/app-wrapper';
+import ComicCard from './comic-card';
 
 import useComicVineService from '../../services/comicvine-service';
 
@@ -227,13 +227,14 @@ const ComicsList = () => {
   function renderItems(arr) {
     const items = arr.map((item) => {
       return (
-        <li className="comics__item" key={item.id}>
-          <Link to={`/comics/${item.id}`} onClick={saveScrollPosition}>
-            <img src={item.thumbnail} alt={item.title} className="comics__item-img" />
-            <div className="comics__item-name">{item.title}</div>
-            <div className="comics__item-price">Issue #{item.issueNumber}</div>
-          </Link>
-        </li>
+        <ComicCard
+          key={item.id}
+          id={item.id}
+          title={item.title}
+          thumbnail={item.thumbnail}
+          issueNumber={item.issueNumber}
+          onSaveScroll={saveScrollPosition}
+        />
       );
     });
 

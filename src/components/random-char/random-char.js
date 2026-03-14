@@ -3,6 +3,7 @@ import React, {useEffect, useState, useContext} from 'react';
 import useComicVineService from '../../services/comicvine-service';
 import setContent from '../../utils/set-content';
 import {CharacterContext} from '../../context/character-context';
+import { isValidImage } from '../../utils/html-utils';
 
 import './random-char.scss';
 import mjolnir from '../../resources/img/mjolnir.png';
@@ -56,7 +57,8 @@ const CharView = ({data}) => {
   const {name, description, thumbnail, id} = data;
 	const {onCharSelected} = useContext(CharacterContext);
 
-  const imgAvailable = thumbnail.includes('image_not_available');
+  // Use Comic Vine image validation (inverted: true when image is NOT available)
+  const imgAvailable = !isValidImage(thumbnail);
 
 	const handleCharacterSelect = () => {
     onCharSelected(id);

@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import useComicVineService from '../../services/comicvine-service';
 import Spinner from '../spinner';
 import ErrorMessage from '../error-message';
+import CharCard from './char-card';
 
 import './char-list.scss';
 
@@ -224,40 +225,23 @@ const CharList = (props) => {
 
   function renderItems(arr) {
     const items = arr.map((item, i) => {
-      let imgStyle = {objectFit: 'cover'};
-
-      if (
-        item.thumbnail.includes('image_not_available') ||
-        item.thumbnail.includes('4c002e0305708.gif')
-      ) {
-        imgStyle = {objectFit: 'unset'};
-      }
-
-      const initialClass =
-        lastIndex === i ? 'char__item char__item_selected' : 'char__item';
+      const handleSelect = () => {
+        props.onCharSelected(item.id);
+        focusOnItem(i);
+        sessionStorage.setItem('lastSelectedCharIndex', i);
+      };
 
       return (
-        <li
-          className={initialClass}
+        <CharCard
           key={item.id}
-          tabIndex={0}
-          ref={(element) => (itemRefs.current[i] = element)}
-          onClick={() => {
-            props.onCharSelected(item.id);
-            focusOnItem(i);
-            sessionStorage.setItem('lastSelectedCharIndex', i);
-          }}
-          onKeyDown={(e) => {
-            if (e.key === ' ' || e.key === 'Enter') {
-              props.onCharSelected(item.id);
-              focusOnItem(i);
-              sessionStorage.setItem('lastSelectedCharIndex', i);
-            }
-          }}
-        >
-          <img src={item.thumbnail} alt={item.name} style={imgStyle} />
-          <div className="char__name">{item.name}</div>
-        </li>
+          id={item.id}
+          name={item.name}
+          thumbnail={item.thumbnail}
+          index={i}
+          selected={lastIndex === i}
+          onSelect={handleSelect}
+          itemRef={(element) => (itemRefs.current[i] = element)}
+        />
       );
     });
 
